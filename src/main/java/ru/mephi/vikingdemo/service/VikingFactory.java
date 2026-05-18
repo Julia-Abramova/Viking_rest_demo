@@ -19,6 +19,7 @@ public class VikingFactory {
 
     public Viking createRandomViking() {
         return new Viking(
+                null,
                 faker.name().firstName(),
                 18 + random.nextInt(43),
                 160 + random.nextInt(41),

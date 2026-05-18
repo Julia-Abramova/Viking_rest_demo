@@ -81,15 +81,42 @@ java -jar target/viking-demo-1.0.0.jar
 ```http
 GET http://localhost:8080/api/vikings
 ```
-Через curl для Windows:
 
-```bash
-curl -X "DELETE" "http://localhost:8080/api/vikings/0" -H "accept: */*"
+Создать конкретного викинга:
+
+```http
+POST http://localhost:8080/api/vikings
+Content-Type: application/json
 ```
-для Unix:
+
+```json
+{
+  "name": "Bjorn",
+  "age": 31,
+  "heightCm": 184,
+  "hairColor": "Blond",
+  "beardStyle": "BRAIDED",
+  "equipment": [
+    {
+      "name": "Iron Axe",
+      "quality": "Rare"
+    }
+  ]
+}
+```
+
+Удалить викинга:
 
 ```bash
-curl -X 'DELETE' 'http://localhost:8080/api/vikings/0' -H 'accept: */*'
+curl -X "DELETE" "http://localhost:8080/api/vikings/1" -H "accept: */*"
+```
+
+Перезаписать параметры викинга:
+
+```bash
+curl -X "PUT" "http://localhost:8080/api/vikings/1" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Ivar","age":28,"heightCm":176,"hairColor":"Brown","beardStyle":"SHORT","equipment":[{"name":"Sword","quality":"Legendary"}]}'
 ```
 
 ## Swagger UI

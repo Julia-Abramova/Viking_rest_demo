@@ -7,7 +7,10 @@ package ru.mephi.vikingdemo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mephi.vikingdemo.gui.VikingDesktopFrame;
+import ru.mephi.vikingdemo.model.Viking;
 import ru.mephi.vikingdemo.service.VikingService;
+
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -15,7 +18,7 @@ import ru.mephi.vikingdemo.service.VikingService;
  */
 @Component
 public class VikingListener {
-    private VikingService service;
+    private final VikingService service;
     private VikingDesktopFrame gui;
 
     @Autowired
@@ -27,7 +30,37 @@ public class VikingListener {
         this.gui = gui;
     }
 
+    public Viking createRandomViking() {
+        Viking viking = service.createRandomViking();
+        addViking(viking);
+        return viking;
+    }
+
+    public void addViking(Viking viking) {
+        if (gui == null) {
+            return;
+        }
+
+        SwingUtilities.invokeLater(() -> gui.addNewViking(viking));
+    }
+
+    public void removeViking(int id) {
+        if (gui == null) {
+            return;
+        }
+
+        SwingUtilities.invokeLater(() -> gui.removeViking(id));
+    }
+
+    public void updateViking(Viking viking) {
+        if (gui == null) {
+            return;
+        }
+
+        SwingUtilities.invokeLater(() -> gui.updateViking(viking));
+    }
+
     void testAdd() {
-        gui.addNewViking(service.createRandomViking());
+        createRandomViking();
     }
 }

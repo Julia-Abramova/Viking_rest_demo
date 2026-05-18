@@ -89,9 +89,35 @@ public class VikingRepository {
         return key.intValue();
     }
 
-    public void deleteById(int id) {
+    public boolean update(VikingEntity viking) {
+        String sql = """
+                update vikings
+                set name = ?,
+                    age = ?,
+                    height_cm = ?,
+                    hair_color = ?,
+                    beard_style = ?,
+                    description = ?
+                where id = ?
+                """;
+
+        int updatedRows = jdbcTemplate.update(
+                sql,
+                viking.name(),
+                viking.age(),
+                viking.heightCm(),
+                viking.hairColor().name(),
+                viking.beardStyle().name(),
+                viking.description(),
+                viking.id()
+        );
+
+        return updatedRows > 0;
+    }
+
+    public boolean deleteById(int id) {
         String sql = "delete from vikings where id = ?";
-        jdbcTemplate.update(sql, id);
+        return jdbcTemplate.update(sql, id) > 0;
     }
 
     public void deleteAll() {

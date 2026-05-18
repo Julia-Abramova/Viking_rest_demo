@@ -5,7 +5,7 @@ info:
   description: Демонстрационное REST API для получения списка созданных викингов
 
 servers:
-  - url: http://localhost:8081
+  - url: http://localhost:8080
     description: Локальный сервер разработки
 
 paths:
@@ -25,6 +25,63 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Viking'
+    post:
+      tags:
+        - Vikings
+      summary: Создать конкретного викинга
+      description: Создаёт викинга с параметрами, переданными в теле запроса
+      operationId: createViking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Viking'
+      responses:
+        '201':
+          description: Викинг успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Viking'
+
+  /api/vikings/{id}:
+    put:
+      tags:
+        - Vikings
+      summary: Перезаписать параметры викинга
+      description: Полностью обновляет параметры и список снаряжения викинга
+      operationId: updateViking
+      parameters:
+        - $ref: '#/components/parameters/VikingId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Viking'
+      responses:
+        '200':
+          description: Викинг успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Viking'
+        '404':
+          description: Викинг не найден
+    delete:
+      tags:
+        - Vikings
+      summary: Удалить викинга
+      description: Удаляет викинга и связанное с ним снаряжение
+      operationId: deleteViking
+      parameters:
+        - $ref: '#/components/parameters/VikingId'
+      responses:
+        '204':
+          description: Викинг успешно удалён
+        '404':
+          description: Викинг не найден
 
   /api/vikings/test:
     get:
@@ -44,6 +101,16 @@ paths:
                   type: string
                   
 components:
+  parameters:
+    VikingId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+      description: Идентификатор викинга
+
   schemas:
     Viking:
       type: object
@@ -55,6 +122,11 @@ components:
         - beardStyle
         - equipment
       properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+          example: 1
         name:
           type: string
           example: Ragnar
@@ -100,12 +172,12 @@ components:
     BeardStyle:
       type: string
       enum:
-        - Short
-        - Long
-        - Braided
-        - Forked
-        - None
-      example: Braided
+        - SHORT
+        - LONG
+        - BRAIDED
+        - FORKED
+        - CLEAN_SHAVEN
+      example: BRAIDED
 
     EquipmentQuality:
       type: string

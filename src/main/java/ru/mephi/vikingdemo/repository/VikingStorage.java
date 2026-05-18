@@ -2,6 +2,7 @@ package ru.mephi.vikingdemo.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +35,22 @@ public class VikingStorage {
                 vikingMapper.toVikingEntity(viking)
         );
 
-        for (EquipmentItem item : viking.equipment()) {
+        List<EquipmentItem> equipment = normalizeEquipment(viking);
+        for (EquipmentItem item : equipment) {
             equipmentItemRepository.save(
                     vikingMapper.toEquipmentItemEntity(vikingId, item)
             );
         }
 
-        return viking;
+        return new Viking(
+                vikingId,
+                viking.name(),
+                viking.age(),
+                viking.heightCm(),
+                viking.hairColor(),
+                viking.beardStyle(),
+                equipment
+        );
     }
 
     public List<Viking> findAll() {
@@ -58,8 +68,53 @@ public class VikingStorage {
                 .toList();
     }
 
+    public Optional<Viking> findById(int id) {
+        return vikingRepository.findById(id)
+                .map(vikingEntity -> vikingMapper.toViking(
+                        vikingEntity,
+                        equipmentItemRepository.findByVikingId(id)
+                ));
+    }
+
     @Transactional
-    public void deleteById(int id) {
-        vikingRepository.deleteById(id);
+    public boolean deleteById(int id) {
+        return vikingRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Optional<Viking> update(int id, Viking viking) {
+        if (vikingRepository.findById(id).isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<EquipmentItem> equipment = normalizeEquipment(viking);
+        Viking vikingWithId = new Viking(
+                id,
+                viking.name(),
+                viking.age(),
+                viking.heightCm(),
+                viking.hairColor(),
+                viking.beardStyle(),
+                equipment
+        );
+
+        vikingRepository.update(vikingMapper.toVikingEntity(vikingWithId));
+        equipmentItemRepository.deleteByVikingId(id);
+
+        for (EquipmentItem item : equipment) {
+            equipmentItemRepository.save(
+                    vikingMapper.toEquipmentItemEntity(id, item)
+            );
+        }
+
+        return Optional.of(vikingWithId);
+    }
+
+    private List<EquipmentItem> normalizeEquipment(Viking viking) {
+        if (viking.equipment() == null) {
+            return List.of();
+        }
+
+        return viking.equipment();
     }
 }
